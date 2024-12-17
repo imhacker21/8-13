@@ -1,0 +1,134 @@
+#include <iostream>
+#include <stdexcept> // For range checking (out_of_range)
+
+using namespace std;
+
+template <typename T>
+class CppArray {
+private:
+    T* arr;
+    size_t size;
+
+public:
+    // Constructor to initialize the array of given size
+    CppArray(size_t size) : size(size) {
+        arr = new T[size];
+    }
+
+    // Destructor to free dynamically allocated memory
+    ~CppArray() {
+        delete[] arr;
+    }
+
+    // Copy constructor
+    CppArray(const CppArray& other) : size(other.size) {
+        arr = new T[size];
+        for (size_t i = 0; i < size; ++i) {
+            arr[i] = other.arr[i];
+        }
+    }
+
+    // Assignment operator
+    CppArray& operator=(const CppArray& other) {
+        if (this == &other) {
+            return *this; // Check for self-assignment
+        }
+
+        delete[] arr; // Free existing memory
+        size = other.size;
+        arr = new T[size];
+
+        for (size_t i = 0; i < size; ++i) {
+            arr[i] = other.arr[i];
+        }
+        return *this;
+    }
+
+    // Function to access elements with range checking
+    T& operator[](size_t index) {
+        if (index >= size) {
+            throw out_of_range("Index out of range");
+        }
+        return arr[index];
+    }
+
+    // Constant version of operator[] for read-only access
+    const T& operator[](size_t index) const {
+        if (index >= size) {
+            throw out_of_range("Index out of range");
+        }
+        return arr[index];
+    }
+
+    // Function to get the size of the array
+    size_t getSize() const {
+        return size;
+    }
+
+    // Function to read values into the array
+    void readArray() {
+        for (size_t i = 0; i < size; ++i) {
+            cin >> arr[i];
+        }
+    }
+
+    // Function to print the array
+    void printArray() const {
+        for (size_t i = 0; i < size; ++i) {
+            cout << arr[i] << " ";
+        }
+        cout << endl;
+    }
+
+    // Friend function for output (cout)
+    friend ostream& operator<<(ostream& os, const CppArray& array) {
+        for (size_t i = 0; i < array.size; ++i) {
+            os << array.arr[i] << " ";
+        }
+        return os;
+    }
+
+    // Friend function for input (cin)
+    friend istream& operator>>(istream& is, CppArray& array) {
+        for (size_t i = 0; i < array.size; ++i) {
+            is >> array.arr[i];
+        }
+        return is;
+    }
+};
+
+int main() {
+    try {
+        // Create two CppArray objects
+        CppArray<int> cp1(5);
+        CppArray<int> cp2(5);
+
+        // Read values into cp1 and cp2
+        cout << "Enter values for cp1: ";
+        cin >> cp1;
+        cout << "Enter values for cp2: ";
+        cin >> cp2;
+
+        // Print cp1 and cp2
+        cout << "Array cp1: " << cp1 << endl;
+        cout << "Array cp2: " << cp2 << endl;
+
+        // Assign cp2 to cp1
+        cp1 = cp2;
+        cout << "After assignment, Array cp1: " << cp1 << endl;
+
+        // Access an element in cp1 with range checking
+        cout << "Element at index 3 in cp1: " << cp1[3] << endl;
+
+        // Print the size of cp1
+        cout << "Size of cp1: " << cp1.getSize() << endl;
+
+        // Uncomment to test range checking:
+        // cout << cp1[10] << endl; // Should throw an exception
+
+    } catch (const out_of_range& e) {
+        cout << "Error: " << e.what() << endl;
+    }
+
+    return 0;
+}
